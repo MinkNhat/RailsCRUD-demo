@@ -1,18 +1,18 @@
 class CategoriesController < ApplicationController
   def index
     categories = Category.all
-    render json: categories.to_json(only: [ :id, :name ])
+    render json: categories
   end
 
   def show
     category = Category.find(params[:id])
-    render json: category.to_json(only: [ :id, :name ])
+    render json: category
   end
 
   def create
     category = Category.new(category_params)
     if category.save
-      render json: category.to_json(only: [ :id, :name ]), status: :created
+      render json: category, status: :created
     else
       render json: category.errors, status: :unprocessable_entity
     end
@@ -21,7 +21,7 @@ class CategoriesController < ApplicationController
   def update
     category = Category.find(params[:id])
     if category.update(category_params)
-      render json: category.to_json(only: [ :id, :name ])
+      render json: category
     else
       render json: category, status: :unprocessable_entity
     end
