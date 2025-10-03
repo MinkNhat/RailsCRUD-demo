@@ -7,11 +7,21 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  resources :categories do
-    member do
-      get :products
+  namespace :api do
+    namespace :v1 do
+      namespace :auth do
+        post "/login", to: "auth#login"
+        post "/signup", to: "auth#signup"
+        post "/create-admin", to: "auth#create_admin"
+      end
+
+      resources :categories do
+        member do
+          get :products
+        end
+      end
+
+      resources :products
     end
   end
-
-  resources :products
 end
