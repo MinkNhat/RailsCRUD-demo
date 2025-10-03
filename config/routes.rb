@@ -1,5 +1,14 @@
 Rails.application.routes.draw do
-  devise_for :users
+  # devise_for :users
+  devise_for :users, path: "auth", path_names: {
+    sign_in: "login",
+    sign_out: "logout",
+    registration: "signup"
+  },
+  controllers: {
+    sessions: "users/sessions",
+    registrations: "users/registrations"
+  }
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -8,21 +17,21 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  namespace :api do
-    namespace :v1 do
-      namespace :auth do
-        post "/login", to: "auth#login"
-        post "/signup", to: "auth#signup"
-        post "/create-admin", to: "auth#create_admin"
-      end
+  # namespace :api do
+  #   namespace :v1 do
+  #     namespace :auth do
+  #       post "/login", to: "auth#login"
+  #       post "/signup", to: "auth#signup"
+  #       post "/create-admin", to: "auth#create_admin"
+  #     end
 
-      resources :categories do
-        member do
-          get :products
-        end
-      end
+  #     resources :categories do
+  #       member do
+  #         get :products
+  #       end
+  #     end
 
-      resources :products
-    end
-  end
+  #     resources :products
+  #   end
+  # end
 end
