@@ -1,7 +1,7 @@
 module Api
   module V1
     class CategoriesController < ApplicationController
-      skip_before_action :authorized, only: [ :index, :show ]
+      skip_before_action :authorized, only: [ :index, :show, :products ]
       before_action :authorize_admin, only: [ :create, :update, :destroy ]
 
       def index
