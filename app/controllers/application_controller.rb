@@ -4,4 +4,29 @@ class ApplicationController < ActionController::API
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: %i[role])
   end
+
+
+  # catching errors
+  rescue_from StandardError, with: :handle_internal_server_error # first to catch latest
+  rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
+  rescue_from ActiveRecord::RecordInvalid, with: :handle_unprocessable_entity
+  rescue_from ActionController::ParameterMissing, with: :handle_params_missing
+
+  def handle_internal_server_error(error)
+    logger.error error.backtrace.join("\n")
+    render json: { error: "Error..." }, status: :internal_server_error
+  end
+
+  def handle_not_found(error)
+    render json: { error: error.message }, status: :not_found
+  end
+
+  def handle_unprocessable_entity(error)
+    message = error.record.errors.full_messages.join(", ")
+    render json: { error: message }, status: :unprocessable_entity
+  end
+
+  def handle_params_missing(error)
+    render json: { error: error.message }, status: :bad_request
+  end
 end

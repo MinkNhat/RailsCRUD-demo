@@ -13,21 +13,14 @@ module Api
           end
 
           def create
-            product = Product.new(product_params)
-            if product.save
-              render json: product, serializer: ::Admin::ProductSerializer, status: :created
-            else
-              render json: product.errors, status: :unprocessable_entity
-            end
+            product = Product.create!(product_params)
+            render json: product, serializer: ::Admin::ProductSerializer, status: :created
           end
 
           def update
             product = Product.find(params[:id])
-            if product.update(product_params)
-              render json: product, serializer: ::Admin::ProductSerializer
-            else
-              render json: product.errors, status: :unprocessable_entity
-            end
+            product.update!(product_params)
+            render json: product, serializer: ::Admin::ProductSerializer
           end
 
           def destroy

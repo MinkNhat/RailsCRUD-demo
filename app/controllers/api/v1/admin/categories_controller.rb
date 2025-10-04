@@ -13,21 +13,14 @@ module Api
         end
 
         def create
-          category = Category.new(category_params)
-          if category.save
-            render json: category, serializer: ::Admin::CategorySerializer, status: :created
-          else
-            render json: category.errors, status: :unprocessable_entity
-          end
+          category = Category.create!(category_params)
+          render json: category, serializer: ::Admin::CategorySerializer, status: :created
         end
 
         def update
           category = Category.find(params[:id])
-          if category.update(category_params)
-            render json: category, serializer: ::Admin::CategorySerializer
-          else
-            render json: category, status: :unprocessable_entity
-          end
+          category.update!(category_params)
+          render json: category, serializer: ::Admin::CategorySerializer
         end
 
         def destroy
