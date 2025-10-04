@@ -2,14 +2,19 @@ class Users::RegistrationsController < Devise::RegistrationsController
   include RackSessionsFix
   respond_to :json
 
-  private
+  # alway user role when signup
+  def sign_up_params
+    user_params = params.require(:user).permit(:email, :password)
+    user_params[:role] = "user"
+    user_params
+  end
 
-  def respond_with(current_user, _opts = {})
+  def respond_with(resource, _opts = {})
     if resource.persisted?
-      render json: UserSerializer.new(current_user).serializable_hash, status: :created
+      render json: UserSerializer.new(resource).serializable_hash, status: :created
     else
       render json: {
-        message: "User couldn't be created successfully. #{current_user.errors.full_messages.to_sentence}"
+        message: "User couldn't be created successfully. #{resource.errors.full_messages.to_sentence}"
       }, status: :unprocessable_entity
     end
   end

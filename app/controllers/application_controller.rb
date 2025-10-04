@@ -5,12 +5,12 @@ class ApplicationController < ActionController::API
     devise_parameter_sanitizer.permit(:sign_up, keys: %i[role])
   end
 
-
   # catching errors
   rescue_from StandardError, with: :handle_internal_server_error # first to catch latest
   rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
   rescue_from ActiveRecord::RecordInvalid, with: :handle_unprocessable_entity
-  rescue_from ActionController::ParameterMissing, with: :handle_params_missing
+  rescue_from ActionController::ParameterMissing, with: :handle_bad_request
+  rescue_from ActionController::BadRequest, with: :handle_bad_request
 
   def handle_internal_server_error(error)
     logger.error error.backtrace.join("\n")
@@ -26,7 +26,7 @@ class ApplicationController < ActionController::API
     render json: { error: message }, status: :unprocessable_entity
   end
 
-  def handle_params_missing(error)
+  def handle_bad_request(error)
     render json: { error: error.message }, status: :bad_request
   end
 end
