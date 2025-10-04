@@ -1,0 +1,5 @@
+module Admin
+  class ProductSerializer < ::ProductSerializer
+    attributes :created_at, :updated_at
+  end
+end
