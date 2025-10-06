@@ -3,7 +3,7 @@ module Api
     module Admin
       class ProductsController < Api::V1::Admin::BaseController
           def index
-            products = Product.all
+            products = Product.all.includes(:category)
             render json: products, each_serializer: ::Admin::ProductSerializer
           end
 

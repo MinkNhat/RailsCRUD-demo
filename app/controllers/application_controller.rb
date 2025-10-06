@@ -14,7 +14,7 @@ class ApplicationController < ActionController::API
 
   def handle_internal_server_error(error)
     logger.error error.backtrace.join("\n")
-    render json: { error: "Error..." }, status: :internal_server_error
+    render json: { error: error.message }, status: :internal_server_error
   end
 
   def handle_not_found(error)
