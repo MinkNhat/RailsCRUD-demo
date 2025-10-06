@@ -3,6 +3,7 @@ module Api
     module Admin
       class UsersController < Api::V1::Admin::BaseController
         def create
+          authorize User
           user = User.create!(admin_user_params)
           render json: user, serializer: UserSerializer, status: :created
         end

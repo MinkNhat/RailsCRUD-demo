@@ -5,5 +5,5 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
-  enum role: [ :user, :admin ]
+  enum role: { user: 0, admin: 1, super_admin: 2, content_manager: 3 }
 end

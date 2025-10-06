@@ -14,6 +14,7 @@ gem "active_model_serializers", "~> 0.10.2"
 gem "dotenv-rails"
 gem "devise"
 gem "devise-jwt"
+gem "pundit"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"

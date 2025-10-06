@@ -9,8 +9,29 @@
 #   end
 
 User.create!(
-  email: 'admin@mail.com',
+  email: 'superadmin@gmail.com',
+  password: '123456',
+  password_confirmation: '123456',
+  role: "super_admin"
+)
+
+User.create!(
+  email: 'user@gmail.com',
+  password: '123456',
+  password_confirmation: '123456',
+  role: "user"
+)
+
+User.create!(
+  email: 'admin@gmail.com',
   password: '123456',
   password_confirmation: '123456',
   role: "admin"
+)
+
+User.create!(
+  email: 'manager@gmail.com',
+  password: '123456',
+  password_confirmation: '123456',
+  role: "content_manager"
 )

@@ -3,27 +3,32 @@ module Api
     module Admin
       class CategoriesController < Api::V1::Admin::BaseController
         def index
+          authorize Category
           categories = Category.all
           render json: categories, each_serializer: ::Admin::CategorySerializer
         end
 
         def show
+          authorize Category
           category = Category.find(params[:id])
           render json: category, serializer: ::Admin::CategorySerializer
         end
 
         def create
+          authorize Category
           category = Category.create!(category_params)
           render json: category, serializer: ::Admin::CategorySerializer, status: :created
         end
 
         def update
+          authorize Category
           category = Category.find(params[:id])
           category.update!(category_params)
           render json: category, serializer: ::Admin::CategorySerializer
         end
 
         def destroy
+          authorize Category
           category = Category.find(params[:id])
           category.destroy
           head :no_content

@@ -3,27 +3,32 @@ module Api
     module Admin
       class ProductsController < Api::V1::Admin::BaseController
           def index
+            authorize Product
             products = Product.all.includes(:category)
             render json: products, each_serializer: ::Admin::ProductSerializer
           end
 
           def show
+            authorize Product
             product = Product.find(params[:id])
             render json: product, serializer: ::Admin::ProductSerializer
           end
 
           def create
+            authorize Product
             product = Product.create!(product_params)
             render json: product, serializer: ::Admin::ProductSerializer, status: :created
           end
 
           def update
+            authorize Product
             product = Product.find(params[:id])
             product.update!(product_params)
             render json: product, serializer: ::Admin::ProductSerializer
           end
 
           def destroy
+            authorize Product
             product = Product.find(params[:id])
             product.destroy
             head :no_content
