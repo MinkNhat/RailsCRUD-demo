@@ -10,6 +10,8 @@ end
 
 class Product < ApplicationRecord
   belongs_to :category
+  has_many :product_images, -> { order(:position) }, dependent: :destroy # -> { order(:position) } scope sắp xếp position
+
   validates :name, :price, presence: true
   validates :name, length: { maximum: 50 }
   validates :price, numericality: true, comparison: { greater_than: 0 }

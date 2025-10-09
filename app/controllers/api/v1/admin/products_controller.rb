@@ -4,7 +4,7 @@ module Api
       class ProductsController < Api::V1::Admin::BaseController
           def index
             authorize Product
-            products = Product.all.includes(:category)
+            products = Product.all.includes(:category, product_images: { image_attachment: :blob })
             render json: products, each_serializer: ::Admin::ProductSerializer
           end
 
@@ -17,6 +17,11 @@ module Api
           def create
             authorize Product
             product = Product.create!(product_params)
+
+            # create images
+            Array(params[:product][:product_images]).each_with_index do |image, index|
+              product.product_images.create(image: image, position: index)
+            end
             render json: product, serializer: ::Admin::ProductSerializer, status: :created
           end
 
@@ -37,7 +42,7 @@ module Api
           private
 
           def product_params
-            params.require(:product).permit(:name, :price, :category_id)
+            params.require(:product).permit(:name, :price, :category_id, images: [])
           end
       end
     end
