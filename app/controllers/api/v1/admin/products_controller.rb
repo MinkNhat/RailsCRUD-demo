@@ -6,7 +6,7 @@ module Api
 
         def index
           authorize Product
-          products = Product.all.includes(:category, product_images: { image_attachment: :blob })
+          products = Product.all.includes(:category, product_images: { image_attachment: :blob }, product_properties: [])
           render json: products, each_serializer: ::Admin::ProductSerializer
         end
 
