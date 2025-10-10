@@ -2,71 +2,72 @@ module Api
   module V1
     module Admin
       class ProductsController < Api::V1::Admin::BaseController
-           before_action :simplify_params_key, only: [ :create, :update ]
+        before_action :simplify_params_key, only: [ :create, :update ]
 
-          def index
-            authorize Product
-            products = Product.all.includes(:category, product_images: { image_attachment: :blob })
-            render json: products, each_serializer: ::Admin::ProductSerializer
+        def index
+          authorize Product
+          products = Product.all.includes(:category, product_images: { image_attachment: :blob })
+          render json: products, each_serializer: ::Admin::ProductSerializer
+        end
+
+        def show
+          authorize Product
+          product = Product.find(params[:id])
+          render json: product, serializer: ::Admin::ProductSerializer
+        end
+
+        def create
+          authorize Product
+          logger.info(">>> Product_params: #{product_params}")
+          product = Product.create!(product_params)
+          render json: product, serializer: ::Admin::ProductSerializer, status: :created
+        end
+
+        def update
+          authorize Product
+          product = Product.find(params[:id])
+          handle_duplicate_key(product)
+
+          product.update!(product_params)
+          render json: product, serializer: ::Admin::ProductSerializer
+        end
+
+        def destroy
+          authorize Product
+          product = Product.find(params[:id])
+          product.destroy
+          head :no_content
+        end
+
+        private
+
+        def product_params
+          params.permit(
+            :name, :price, :category_id,
+            product_images_attributes: [ :id, :image, :position, :_destroy ],
+            product_properties_attributes: [ :id, :key, :value, :_destroy ]
+          )
+        end
+
+        def simplify_params_key
+          # nhận params từ client có key images/properties thay vì product_images_attributes/product_properties_attributes
+          # gán key sau đó xoá tránh trùng key
+          if params[:images]
+            params[:product_images_attributes] = params.delete(:images)
           end
 
-          def show
-            authorize Product
-            product = Product.find(params[:id])
-            render json: product, serializer: ::Admin::ProductSerializer
+          if params[:properties]
+            params[:product_properties_attributes] = params.delete(:properties)
           end
+        end
 
-          def create
-            authorize Product
-            product = Product.create!(product_params)
-            render json: product, serializer: ::Admin::ProductSerializer, status: :created
-          end
+        def handle_duplicate_key(product)
+          props_params = params[:product_properties_attributes]
+          return unless props_params.present?
 
-          def update
-            authorize Product
-            product = Product.find(params[:id])
-            handle_duplicate_key(product)
-
-            product.update!(product_params)
-            render json: product, serializer: ::Admin::ProductSerializer
-          end
-
-          def destroy
-            authorize Product
-            product = Product.find(params[:id])
-            product.destroy
-            head :no_content
-          end
-
-          private
-
-          def product_params
-            params.require(:product).permit(
-              :name, :price, :category_id,
-              product_images_attributes: [ :id, :image, :position, :_destroy ],
-              product_properties_attributes: [ :id, :key, :value, :_destroy ]
-            )
-          end
-
-          def simplify_params_key
-            # nhận params từ client có key images/properties thay vì product_images_attributes/product_properties_attributes
-            # gán key sau đó xoá tránh trùng key
-            if params[:product][:images]
-              params[:product][:product_images_attributes] = params[:product].delete(:images)
-            end
-
-            if params[:product][:properties]
-              params[:product][:product_properties_attributes] = params[:product].delete(:properties)
-            end
-          end
-
-          def handle_duplicate_key(product)
-            props_params = params[:product][:product_properties_attributes]
-            return unless props_params.present?
-
-            req_keys = props_params.map { |p| p[:key] }
-            product.product_properties.where(key: req_keys).destroy_all
-          end
+          req_keys = props_params.map { |p| p[:key] }
+          product.product_properties.where(key: req_keys).destroy_all
+        end
       end
     end
   end
