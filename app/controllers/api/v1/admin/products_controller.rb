@@ -25,6 +25,8 @@ module Api
           def update
             authorize Product
             product = Product.find(params[:id])
+            handle_duplicate_key(product)
+
             product.update!(product_params)
             render json: product, serializer: ::Admin::ProductSerializer
           end
@@ -56,6 +58,14 @@ module Api
             if params[:product][:properties]
               params[:product][:product_properties_attributes] = params[:product].delete(:properties)
             end
+          end
+
+          def handle_duplicate_key(product)
+            props_params = params[:product][:product_properties_attributes]
+            return unless props_params.present?
+
+            req_keys = props_params.map { |p| p[:key] }
+            product.product_properties.where(key: req_keys).destroy_all
           end
       end
     end
