@@ -18,7 +18,6 @@ module Api
 
         def create
           authorize Product
-          logger.info(">>> Product_params: #{product_params}")
           product = Product.create!(product_params)
           render json: product, serializer: ::Admin::ProductSerializer, status: :created
         end

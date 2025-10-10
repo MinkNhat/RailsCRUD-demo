@@ -11,10 +11,10 @@ end
 class Product < ApplicationRecord
   belongs_to :category
   has_many :product_images, -> { order(:position) }, dependent: :destroy # -> { order(:position) } scope sắp xếp position
-  has_many :product_properties, dependent: :destroy, reject_if: :reject_properties
+  has_many :product_properties, dependent: :destroy
 
   # nested attributes --> cho phép tạo / sửa model con qua model cha
-  accepts_nested_attributes_for :product_properties, allow_destroy: true
+  accepts_nested_attributes_for :product_properties, allow_destroy: true, reject_if: :reject_properties
   accepts_nested_attributes_for :product_images, allow_destroy: true
 
   validates :name, :price, presence: true
