@@ -1,5 +1,9 @@
 class ProductSerializer < ActiveModel::Serializer
-  attributes :id, :name, :price, :category, :images
+  attributes :id, :name, :price, :category, :images, :properties
+
+  def properties
+    object.product_properties.map { |p| { key: p.key, value: p.value } }
+  end
 
   def images
     object.product_images.map do |img|

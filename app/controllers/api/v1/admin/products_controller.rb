@@ -2,6 +2,8 @@ module Api
   module V1
     module Admin
       class ProductsController < Api::V1::Admin::BaseController
+           before_action :simplify_params_key, only: [ :create, :update ]
+
           def index
             authorize Product
             products = Product.all.includes(:category, product_images: { image_attachment: :blob })
@@ -17,11 +19,6 @@ module Api
           def create
             authorize Product
             product = Product.create!(product_params)
-
-            # create images
-            Array(params[:product][:product_images]).each_with_index do |image, index|
-              product.product_images.create(image: image, position: index)
-            end
             render json: product, serializer: ::Admin::ProductSerializer, status: :created
           end
 
@@ -42,7 +39,23 @@ module Api
           private
 
           def product_params
-            params.require(:product).permit(:name, :price, :category_id, images: [])
+            params.require(:product).permit(
+              :name, :price, :category_id,
+              product_images_attributes: [ :id, :image, :position, :_destroy ],
+              product_properties_attributes: [ :id, :key, :value, :_destroy ]
+            )
+          end
+
+          def simplify_params_key
+            # nhận params từ client có key images/properties thay vì product_images_attributes/product_properties_attributes
+            # gán key sau đó xoá tránh trùng key
+            if params[:product][:images]
+              params[:product][:product_images_attributes] = params[:product].delete(:images)
+            end
+
+            if params[:product][:properties]
+              params[:product][:product_properties_attributes] = params[:product].delete(:properties)
+            end
           end
       end
     end
