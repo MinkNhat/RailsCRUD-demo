@@ -22,6 +22,7 @@ Rails.application.routes.draw do
         resources :categories
         resources :products
         resources :users, only: [ :create ]
+        patch "products/:id/move_image", to: "products#move_image"
       end
     end
   end

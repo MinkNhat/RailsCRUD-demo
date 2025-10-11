@@ -49,6 +49,17 @@ module Api
           head :no_content
         end
 
+        def move_image
+          product = Product.find(params[:id])
+
+          image = product.images_attachments.find_by(position: params[:old_position].to_i)
+          return render json: { error: "Not found image in position #{params[:old_position].to_i}" }, status: :not_found unless image
+
+          image.insert_at(params[:new_position].to_i)
+
+          render json: product, serializer: ::Admin::ProductSerializer
+        end
+
         private
 
         def product_params
