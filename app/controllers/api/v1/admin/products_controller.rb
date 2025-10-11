@@ -6,7 +6,7 @@ module Api
 
         def index
           authorize Product
-          products = Product.all.includes(:category, product_images: { image_attachment: :blob }, product_properties: [])
+          products = Product.all.includes(:category, product_properties: [], images_attachments: :blob)
           render json: products, each_serializer: ::Admin::ProductSerializer
         end
 
@@ -25,9 +25,20 @@ module Api
         def update
           authorize Product
           product = Product.find(params[:id])
-          handle_duplicate_key(product)
 
-          product.update!(product_params)
+          handle_duplicate_key(product)
+          product.update!(product_params.except(:images))
+
+          # xoá ảnh nếu có yêu cầu
+          if params[:remove_image].present?
+            product.images_attachments.where(id: params[:remove_image]).destroy_all
+          end
+
+          # attach thêm ảnh, không xoá ảnh cũ
+          if params[:images].present?
+            product.images.attach(params[:images])
+          end
+
           render json: product, serializer: ::Admin::ProductSerializer
         end
 
@@ -42,19 +53,14 @@ module Api
 
         def product_params
           params.permit(
-            :name, :price, :category_id,
-            product_images_attributes: [ :id, :image, :position, :_destroy ],
+            :name, :price, :category_id, images: [],
             product_properties_attributes: [ :id, :key, :value, :_destroy ]
           )
         end
 
         def simplify_params_key
-          # nhận params từ client có key images/properties thay vì product_images_attributes/product_properties_attributes
+          # nhận params từ client có key properties thay vì product_properties_attributes
           # gán key sau đó xoá tránh trùng key
-          if params[:images]
-            params[:product_images_attributes] = params.delete(:images)
-          end
-
           if params[:properties]
             params[:product_properties_attributes] = params.delete(:properties)
           end
