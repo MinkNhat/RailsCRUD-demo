@@ -1,9 +1,16 @@
 module Api
   module V1
     class CategoriesController < ApplicationController
+      include Pagy::Backend
+
       def index
-        categories = Category.all
-        render json: categories, each_serializer: CategorySerializer
+        pagy, categories = pagy(Category.all)
+
+        render_pagy(
+          meta: pagy_metadata(pagy),
+          data: categories,
+          serializer: CategorySerializer
+        )
       end
 
       def show

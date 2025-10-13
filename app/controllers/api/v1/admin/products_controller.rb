@@ -2,12 +2,19 @@ module Api
   module V1
     module Admin
       class ProductsController < Api::V1::Admin::BaseController
+        include Pagy::Backend
+
         before_action :simplify_params_key, only: [ :create, :update ]
 
         def index
           authorize Product
-          products = Product.all.includes(:category, product_properties: [], images_attachments: :blob)
-          render json: products, each_serializer: ::Admin::ProductSerializer
+          pagy, products = pagy(Product.all.includes(:category, product_properties: [], images_attachments: :blob))
+
+          render_pagy(
+            meta: pagy_metadata(pagy),
+            data: products,
+            serializer: ::Admin::ProductSerializer
+          )
         end
 
         def show

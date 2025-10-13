@@ -2,10 +2,17 @@ module Api
   module V1
     module Admin
       class CategoriesController < Api::V1::Admin::BaseController
+        include Pagy::Backend
+
         def index
           authorize Category
-          categories = Category.all
-          render json: categories, each_serializer: ::Admin::CategorySerializer
+          pagy, categories = pagy(Category.all)
+
+          render_pagy(
+            meta: pagy_metadata(pagy),
+            data: categories,
+            serializer: ::Admin::CategorySerializer
+          )
         end
 
         def show

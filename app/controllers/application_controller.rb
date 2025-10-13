@@ -36,4 +36,11 @@ class ApplicationController < ActionController::API
   def user_not_authorized
     render json: { error: "You not have permission to do this action" }, status: :forbidden
   end
+
+  def render_pagy(meta: {}, data:, serializer: nil, status: :ok)
+    serialized = serializer ? ActiveModelSerializers::SerializableResource.new(data, each_serializer: serializer) : data
+    response = { meta: meta, data: serialized }
+
+    render json: response, status: status
+  end
 end
