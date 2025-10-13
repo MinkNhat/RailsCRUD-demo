@@ -8,7 +8,8 @@ module Api
 
         def index
           authorize Product
-          pagy, products = pagy(Product.all.includes(:category, product_properties: [], images_attachments: :blob))
+          logger.info "size-params: #{params[:size]}"
+          pagy, products = pagy(Product.all.includes(:category, product_properties: [], images_attachments: :blob), limit: params[:size] || Pagy::DEFAULT[:limit])
 
           render_pagy(
             meta: pagy_metadata(pagy),
@@ -72,7 +73,7 @@ module Api
         def product_params
           params.permit(
             :name, :price, :category_id, images: [],
-            product_properties_attributes: [ :id, :key, :value, :_destroy ]
+            product_properties_attributes: [ :id, :key, :value, :_destroy ],
           )
         end
 

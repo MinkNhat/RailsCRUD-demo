@@ -4,7 +4,7 @@ module Api
       include Pagy::Backend
 
       def index
-        pagy, products = pagy(Product.all.includes(:category, product_properties: [], images_attachments: :blob))
+        pagy, products = pagy(Product.all.includes(:category, product_properties: [], images_attachments: :blob), limit: params[:size] || Pagy::DEFAULT[:limit])
 
         render_pagy(
           meta: pagy_metadata(pagy),

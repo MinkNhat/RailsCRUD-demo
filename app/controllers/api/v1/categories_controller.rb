@@ -4,7 +4,7 @@ module Api
       include Pagy::Backend
 
       def index
-        pagy, categories = pagy(Category.all)
+        pagy, categories = pagy(Category.all, limit: params[:size] || Pagy::DEFAULT[:limit])
 
         render_pagy(
           meta: pagy_metadata(pagy),
