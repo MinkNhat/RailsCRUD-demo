@@ -17,6 +17,7 @@ class ProductSerializer < ActiveModel::Serializer
 
   def category
     {
+      id: object.category.id,
       name: object.category.name
     }
   end

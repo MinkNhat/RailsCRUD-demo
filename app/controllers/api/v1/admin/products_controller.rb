@@ -8,8 +8,10 @@ module Api
 
         def index
           authorize Product
-          logger.info "size-params: #{params[:size]}"
-          pagy, products = pagy(Product.all.includes(:category, product_properties: [], images_attachments: :blob), limit: params[:size] || Pagy::DEFAULT[:limit])
+
+          # distinct: true tránh trùng product khi join table
+          q = Product.includes(:category, product_properties: [], images_attachments: :blob).ransack(params[:q])
+          pagy, products = pagy(q.result(distinct: true), limit: params[:size] || Pagy::DEFAULT[:limit])
 
           render_pagy(
             meta: pagy_metadata(pagy),

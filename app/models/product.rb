@@ -7,7 +7,6 @@ class ProductNameStartWithSpValidator < ActiveModel::EachValidator
   end
 end
 
-
 class Product < ApplicationRecord
   belongs_to :category
   has_many :product_properties, dependent: :destroy
@@ -23,5 +22,14 @@ class Product < ApplicationRecord
 
   def reject_properties(property)
     property[:key].blank?
+  end
+
+  # allow attributes for filtering
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[name price]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[category]
   end
 end
